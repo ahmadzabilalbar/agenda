@@ -299,6 +299,15 @@
         .btn-add { background: var(--primary); color: white; border: none; padding: 12px; font-weight: 600; }
 
         /* Toast Message */
+        .app-version-tag {
+            margin-top: auto;
+            padding-top: 20px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            text-align: center;
+        }
+
         .toast {
             position: fixed;
             bottom: 30px;
@@ -420,6 +429,7 @@
                 <input type="text" id="eventInput" placeholder="Add note..." maxlength="100">
                 <button id="addEventBtn" class="btn-add">Save to Agenda</button>
             </div>
+            <div class="app-version-tag">v1.0.0</div>
         </aside>
     </main>
 
