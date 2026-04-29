@@ -605,7 +605,10 @@
                     </div>
                 </div>
             `;
-            row.onclick = () => openSidebar(year, month, day);
+            row.onclick = (e) => {
+                e.stopPropagation();
+                openSidebar(year, month, day);
+            };
             return row;
         }
 
@@ -755,12 +758,14 @@
         document.getElementById('copyWabtn').onclick = copyForWA;
         document.getElementById('closeSidebar').onclick = () => sidebar.classList.remove('open');
 
-        // Close sidebar on background click
-        document.querySelector('.calendar-list-wrapper').onclick = (e) => {
+        // Close sidebar on background click (wrapper only)
+        document.querySelector('.calendar-list-wrapper').onclick = () => {
             if (sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
             }
         };
+        // Also close on main background
+        document.querySelector('.bg-mesh').onclick = () => sidebar.classList.remove('open');
         document.getElementById('addEventBtn').onclick = addEvent;
         document.getElementById('eventInput').onkeypress = (e) => { if(e.key === 'Enter') addEvent(); };
 
