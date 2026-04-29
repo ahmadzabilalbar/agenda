@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Crect width='512' height='512' fill='white'/%3E%3Cimage href='https://cdn-icons-png.flaticon.com/512/8740/8740776.png' x='128' y='128' width='256' height='256'/%3E%3C/svg%3E">
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQWdlbmRhIiwic2hvcnRfbmFtZSI6IkFnZW5kYSIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJ0aGVtZV9jb2xvciI6IiM0ZjQ2ZTUiLCJzdGFydF91cmwiOiIuIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmclMjB4bWxucz0lMjdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyUyNyUyMHdpZHRoPSUyNzUxMiUyNyUyMGhlaWdodD0lMjc1MTIlMjclM0UlM0NyZWN0JTIwd2lkdGg9JTI3NTEyJTI3JTIwaGVpZ2h0PSUyNzUxMiUyNyUyMGZpbGw9JTI3d2hpdGUlMjclMkYlM0UlM0NpbWFnZSUyMGhyZWY9JTI3aHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvODc0MC84NzQwNzc2LnBuZyUyNyUyMHg9JTI3MTI4JTI3JTIweT0lMjcxMjglMjclMjB3aWR0aD0lMjcyNTYlMjclMjBoZWlnaHQ9JTI3MjU2JTI3JTJGJTNFJTNDL3N2ZyUzRSIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9XX0=">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/8740/8740776.png">
+    <link rel="manifest" href='data:application/json,{"name":"Agenda","short_name":"Agenda","display":"standalone","background_color":"#ffffff","theme_color":"#4f46e5","start_url":"./","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/8740/8740776.png","sizes":"512x512","type":"image/png","purpose":"any maskable"},{"src":"https://cdn-icons-png.flaticon.com/512/8740/8740776.png","sizes":"192x192","type":"image/png","purpose":"any maskable"}]}'>
     
     <style>
         :root {
@@ -400,8 +400,11 @@
                 <button id="refreshBtn" class="btn-icon" title="Check for Updates">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                 </button>
-                <button id="copyWabtn" class="btn-icon" title="Copy for WhatsApp">
+                <button id="copyAllBtn" class="btn-icon" title="Copy All (With Static)">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                </button>
+                <button id="copyNotesBtn" class="btn-icon" title="Copy Notes Only">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 </button>
             </div>
         </header>
@@ -448,7 +451,7 @@
         let events = JSON.parse(localStorage.getItem('agenda_events')) || {};
         let theme = localStorage.getItem('agenda_theme') || 'system';
         let filters = JSON.parse(localStorage.getItem('agenda_filters')) || {
-            holiday: true, mtsd: true, exam: true, school: true, matric: true, tuisyen: true, includeStaticInCopy: true
+            holiday: true, mtsd: true, exam: true, school: true, matric: true, tuisyen: true
         };
         
         const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -719,7 +722,7 @@
             }, 300);
         }
 
-        function copyForWA() {
+        function copyToClipboard(includeStatic) {
             const year = currentDate.getFullYear();
             const month = focusedMonth;
             let text = `*AGENDA ${fullMonths[month].toUpperCase()} ${year}*\n\n`;
@@ -727,8 +730,7 @@
             for (let d = 1; d <= days; d++) {
                 const key = `${year}-${month + 1}-${d}`;
                 let items = [];
-                // Respect includeStaticInCopy filter
-                if (filters.includeStaticInCopy && mtsdEvents[key]) {
+                if (includeStatic && mtsdEvents[key]) {
                     mtsdEvents[key].forEach(e => {
                         const isVisible = (e.type === 'exam') ? filters.mtsd : filters[e.type];
                         if (isVisible) items.push(e.type === 'holiday' ? `_${e.title}_` : `*${e.title}*`);
@@ -740,7 +742,7 @@
                     text += `${dt.toLocaleDateString('en-US',{weekday:'short'})}, ${d}/${month + 1} ${items.join(', ')}\n`;
                 }
             }
-            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+            navigator.clipboard.writeText(text).then(() => showToast(includeStatic ? 'All Data Copied!' : 'Notes Only Copied!'));
         }
 
         // Theme & Static Initialization
@@ -776,7 +778,8 @@
         });
 
         document.getElementById('todayBtn').onclick = scrollToToday;
-        document.getElementById('copyWabtn').onclick = copyForWA;
+        document.getElementById('copyAllBtn').onclick = () => copyToClipboard(true);
+        document.getElementById('copyNotesBtn').onclick = () => copyToClipboard(false);
         document.getElementById('closeSidebar').onclick = () => sidebar.classList.remove('open');
 
         // Close sidebar on background click (wrapper only)
@@ -807,8 +810,7 @@
                 mtsd: 'MTSD (Dorm, Outing, Exam)',
                 school: 'School Holidays',
                 matric: 'Cuti Matrik',
-                tuisyen: 'Tuition',
-                includeStaticInCopy: 'Include Static in Copy'
+                tuisyen: 'Tuition'
             };
             
             list.innerHTML = '';
@@ -834,6 +836,15 @@
         processStaticMtsdData();
         renderYear();
         renderFilters();
+
+        // Register Service Worker for PWA Installation
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker failed', err));
+            });
+        }
     </script>
 </body>
 </html>
