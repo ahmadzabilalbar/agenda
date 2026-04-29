@@ -211,9 +211,9 @@
 
         .day-linear-info { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; width: 100%; }
         .day-label { font-weight: 500; color: var(--text-main); min-width: 75px; }
-        .day-agenda { display: flex; align-items: center; gap: 4px; flex: 1; overflow: hidden; }
-
-        .badge-container { display: flex; gap: 4px; align-items: center; }
+        .day-agenda { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; justify-content: flex-start; }
+        .user-tags { display: flex; gap: 4px; overflow: hidden; }
+        .badge-container { display: flex; gap: 4px; align-items: center; margin-left: auto; flex-shrink: 0; }
         .badge {
             padding: 1px 6px;
             border-radius: 4px;
@@ -232,7 +232,6 @@
         .badge.outing { background: rgba(219, 39, 119, 0.15); color: var(--dorm-color); }
         .badge.matric { background: rgba(14, 165, 233, 0.15); color: var(--matric-color); }
 
-        .user-tags { display: flex; gap: 6px; margin-left: auto; }
         .tag.user-event {
             background: #fffbeb;
             color: #92400e;
@@ -602,8 +601,8 @@
                 <div class="day-linear-info">
                     <span class="day-label">${date.toLocaleDateString('en-US', {weekday:'short'})}, ${day}/${month + 1}</span>
                     <div class="day-agenda">
-                        ${badges.length > 0 ? `<div class="badge-container">${badges.join('')}</div>` : ''}
                         ${userTags.length > 0 ? `<div class="user-tags">${userTags.join('')}</div>` : ''}
+                        ${badges.length > 0 ? `<div class="badge-container">${badges.join('')}</div>` : ''}
                     </div>
                 </div>
             `;
