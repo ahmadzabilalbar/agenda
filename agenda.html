@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda | Unified Premium Calendar</title>
+    <meta name="description" content="A sleek, modern, single-file calendar for academic and logistics tracking.">
+    <!-- Mobile App Optimization (Single File PWA-lite) -->
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQWdlbmRhIiwic2hvcnRfbmFtZSI6IkFnZW5kYSIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiM0ZjQ2ZTUiLCJ0aGVtZV9jb2xvciI6IiM0ZjQ2ZTUiLCJzdGFydF91cmwiOiIuIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzM2NTIvMzY1MjE5MS5wbmciLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9XX0=">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-main: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --holiday-color: #e11d48;
+            --event-color: #059669;
+            --tuisyen-color: #4f46e5;
+            --dorm-color: #db2777;
+            --school-color: #0891b2;
+            --exam-color: #ea580c;
+            --matric-color: #0ea5e9;
+            --user-color: #6366f1;
+            --today-bg: #eff6ff;
+            --glass-blur: 12px;
+        }
+
+        /* Default Dark/Light Variable Overrides */
+        body.dark-theme {
+            --bg-main: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --card-border: #334155;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --today-bg: rgba(79, 70, 229, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-style: normal !important;
+            text-decoration: none !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            transition: background 0.3s ease;
+        }
+
+        /* Premium Animated Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--bg-main);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .app-header {
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            position: sticky;
+            top: 0;
+        }
+
+        .brand h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
+        .brand h1 span { color: var(--primary); }
+
+        .calendar-controls { display: flex; align-items: center; gap: 16px; margin-left: auto; margin-right: 16px; }
+        .current-date-display { text-align: right; }
+        .current-date-display h2 { font-size: 1rem; font-weight: 700; color: var(--primary); }
+        .current-date-display span { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+
+        .btn-icon, .btn-primary, .btn-secondary, .btn-add {
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .btn-icon {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 8px;
+            gap: 6px;
+        }
+
+        .btn-icon:hover { background: var(--card-border); transform: translateY(-1px); }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); transform: translateY(-1px); }
+
+        .btn-secondary {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover { background: #128c7e; transform: translateY(-1px); }
+
+        .calendar-list-wrapper {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            background: transparent;
+            scroll-behavior: smooth;
+        }
+
+        .month-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .month-section.collapsed { min-width: 44px; width: 44px; }
+        .month-section.expanded { min-width: 280px; }
+
+        .month-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .expanded .month-header {
+            height: auto;
+            writing-mode: horizontal-tb;
+            transform: none;
+            padding: 8px 12px;
+        }
+
+        .collapsed .days-list { display: none; }
+        .days-list { padding: 6px; flex: 1; overflow-y: auto; scrollbar-width: thin; }
+
+        .day-row {
+            display: flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-bottom: 1px solid var(--card-border);
+            cursor: pointer;
+            transition: background 0.15s ease;
+            border-radius: 4px;
+            margin: 1px 0;
+        }
+
+        .day-row:hover { background: rgba(0,0,0,0.03); }
+        .day-row.today { background: var(--today-bg); border-left: 2px solid var(--primary); }
+
+        .day-linear-info { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; width: 100%; }
+        .day-label { font-weight: 500; color: var(--text-main); min-width: 75px; }
+        .day-agenda { display: flex; align-items: center; gap: 4px; flex: 1; overflow: hidden; }
+
+        .badge-container { display: flex; gap: 4px; align-items: center; }
+        .badge {
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .badge.holiday { background: rgba(225, 29, 72, 0.15); color: var(--holiday-color); }
+        .badge.event { background: rgba(5, 150, 105, 0.15); color: var(--event-color); }
+        .badge.tuisyen { background: rgba(79, 70, 229, 0.15); color: var(--tuisyen-color); }
+        .badge.dorm { background: rgba(219, 39, 119, 0.15); color: var(--dorm-color); }
+        .badge.school { background: rgba(8, 145, 178, 0.15); color: var(--school-color); }
+        .badge.exam { background: rgba(234, 88, 12, 0.15); color: var(--exam-color); }
+        .badge.outing { background: rgba(219, 39, 119, 0.15); color: var(--dorm-color); }
+        .badge.matric { background: rgba(14, 165, 233, 0.15); color: var(--matric-color); }
+
+        .user-tags { display: flex; gap: 6px; margin-left: auto; }
+        .tag.user-event {
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px dashed #f59e0b;
+            padding: 1px 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        /* Sidebar Detail */
+        .event-sidebar {
+            position: fixed;
+            right: -420px;
+            top: 0;
+            width: 400px;
+            height: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            border-left: 1px solid var(--card-border);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .event-sidebar.open { right: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .sidebar-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .btn-close { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; }
+
+        .event-list { flex: 1; overflow-y: auto; }
+        .event-item {
+            background: rgba(0,0,0,0.02);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .event-item.holiday { border-left-color: var(--holiday-color); }
+        .event-item.tuisyen { border-left-color: var(--tuisyen-color); }
+        .event-item.dorm { border-left-color: var(--dorm-color); }
+        .event-item.school { border-left-color: var(--school-color); }
+        .event-item.exam { border-left-color: var(--exam-color); }
+        .event-item.outing { border-left-color: var(--dorm-color); }
+        .event-item.matric { border-left-color: var(--matric-color); }
+        .event-item.user-event { border-left: 4px dashed var(--user-color); background: rgba(99, 102, 241, 0.05); }
+
+        .add-event-form { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        #eventInput {
+            background: rgba(0,0,0,0.03);
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            border-radius: 10px;
+            color: var(--text-main);
+            outline: none;
+            font-family: inherit;
+        }
+        #eventInput:focus { border-color: var(--primary); background: transparent; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 12px; font-weight: 600; }
+
+        /* Toast Message */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        @media (max-width: 768px) {
+            .app-header { 
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 56px;
+                padding: 0 12px;
+                padding-top: env(safe-area-inset-top);
+                display: flex !important; 
+                justify-content: space-between; 
+                align-items: center; 
+                background: var(--bg-main) !important;
+                border-bottom: 1px solid var(--card-border);
+                z-index: 9999;
+            }
+            .calendar-controls { display: none !important; }
+            .header-actions { display: flex !important; gap: 4px; align-items: center; justify-content: flex-end; flex: 1; }
+            .header-actions .btn-text { display: none !important; }
+            .brand h1 { font-size: 0.9rem; flex-shrink: 0; }
+            
+            .btn-icon { padding: 8px; border: none; background: transparent; }
+
+            .calendar-list-wrapper { 
+                margin-top: calc(56px + env(safe-area-inset-top));
+                flex-direction: column; 
+                overflow-x: hidden; 
+                overflow-y: auto; 
+            }
+            .month-section { min-width: 100% !important; height: auto; border-radius: 0; border: none; }
+            .month-section.collapsed { height: 40px; }
+            .month-header { 
+                writing-mode: horizontal-tb; 
+                transform: none; 
+                height: 40px; 
+                width: 100%; 
+                display: flex;
+                align-items: center;
+                padding: 0 12px; 
+                border-bottom: 1px solid var(--card-border);
+                position: sticky;
+                top: 0; 
+                background: var(--card-bg);
+                backdrop-filter: blur(10px);
+                z-index: 50;
+            }
+            .month-header span { font-size: 0.85rem; font-weight: 700; color: var(--primary); }
+            .expanded .month-header { border-bottom: 1px solid var(--card-border); }
+            .event-sidebar { width: 100%; right: -100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    <main class="app-container">
+        <header class="app-header">
+            <div class="brand">
+                <h1>Agenda<span>.</span></h1>
+            </div>
+            <div class="calendar-controls">
+                <div class="current-date-display">
+                    <h2>2026</h2>
+                    <span>Agenda Overview</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="installBtnHeader" class="btn-icon" title="Install App">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                </button>
+                <button id="exportBtnHeader" class="btn-icon" title="Export Backup">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </button>
+                <button id="importBtnHeader" class="btn-icon" title="Import Backup">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </button>
+                <input type="file" id="importFile" style="display: none;" accept=".json">
+                
+                <button id="themeToggle" class="btn-icon" title="Toggle Theme">
+                    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <button id="todayBtn" class="btn-icon" title="Jump to Today">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </button>
+                <button id="copyWabtn" class="btn-icon" title="Copy for WhatsApp">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                </button>
+            </div>
+        </header>
+
+        <section class="calendar-list-wrapper" id="yearList">
+            <!-- Year content injected here -->
+        </section>
+
+        <aside class="event-sidebar" id="eventSidebar">
+            <div class="sidebar-header">
+                <h3 id="selectedDateTitle">Date Details</h3>
+                <button id="closeSidebar" class="btn-close">&times;</button>
+            </div>
+            <div class="event-list" id="eventList"></div>
+            <div class="add-event-form">
+                <input type="text" id="eventInput" placeholder="Add note..." maxlength="100">
+                <button id="addEventBtn" class="btn-add">Save to Agenda</button>
+            </div>
+            <div style="margin-top: 20px; padding: 12px; background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.2); border-radius: 12px;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: #128c7e; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3z"></path></svg>
+                    WhatsApp Backup Tip
+                </div>
+                <div style="font-size: 0.65rem; color: var(--text-muted); line-height: 1.4;">
+                    If you received a backup via WhatsApp, find it here:<br>
+                    <code style="display: block; margin-top: 4px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 4px; font-family: monospace; word-break: break-all;">
+                        Internal Storage > Android > Media > com.whatsapp > WhatsApp > Media > WhatsApp Documents
+                    </code>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <div id="toast" class="toast">Action Successful!</div>
+
+    <script>
+        // State management
+        let currentDate = new Date(2026, 0, 1);
+        let selectedDate = null;
+        let focusedMonth = new Date().getMonth();
+        let events = JSON.parse(localStorage.getItem('agenda_events')) || {};
+        let theme = localStorage.getItem('agenda_theme') || 'system';
+        
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        const fullMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let mtsdEvents = {};
+
+        // Static snapshot (2026)
+        const mtsdStaticData = [
+            { "start": "2026-01-01", "end": "2026-01-01", "title": "Tahun Baru", "type": "holiday" },
+            { "start": "2026-01-17", "end": "2026-01-17", "title": "Israk and Mikraj", "type": "holiday" },
+            { "start": "2026-01-29", "end": "2026-01-31", "title": "Tahun Baru Cina", "type": "holiday" },
+            { "start": "2026-02-01", "end": "2026-02-01", "title": "Thaipusam", "type": "holiday" },
+            { "start": "2026-03-20", "end": "2026-03-20", "title": "Hari Raya Aidilfitri", "type": "holiday" },
+            { "start": "2026-05-01", "end": "2026-05-01", "title": "Hari Pekerja", "type": "holiday" },
+            { "start": "2026-05-27", "end": "2026-05-27", "title": "Hari Raya Haji", "type": "holiday" },
+            { "start": "2026-06-21", "end": "2026-06-21", "title": "Sultan Kedah's Birthday", "type": "holiday" },
+            { "start": "2026-08-31", "end": "2026-08-31", "title": "Hari Kebangsaan", "type": "holiday" },
+            { "start": "2026-09-16", "end": "2026-09-16", "title": "Hari Malaysia", "type": "holiday" },
+            { "start": "2026-11-08", "end": "2026-11-08", "title": "Hari Deepavali", "type": "holiday" },
+            { "start": "2026-12-25", "end": "2026-12-25", "title": "Hari Krismas", "type": "holiday" },
+            { "start": "2026-11-06", "end": "2026-11-09", "title": "MTSD PULANG BERMALAM", "type": "dorm" },
+            { "start": "2026-12-04", "end": "2026-12-31", "title": "Cuti Sekolah", "type": "school" },
+            { "start": "2026-01-23", "end": "2026-01-31", "title": "Cuti Matrik", "type": "matric" },
+            { "start": "2026-05-15", "end": "2026-07-31", "title": "Cuti Matrik", "type": "matric" },
+            { "start": "2026-09-18", "end": "2026-09-26", "title": "Cuti Matrik", "type": "matric" },
+            { "start": "2026-01-30", "end": "2026-01-31", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-02-13", "end": "2026-02-21", "title": "Cuti Sekolah", "type": "school" },
+            { "start": "2026-03-06", "end": "2026-03-07", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-03-20", "end": "2026-03-29", "title": "Cuti Sekolah", "type": "school" },
+            { "start": "2026-04-24", "end": "2026-04-25", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-05-22", "end": "2026-06-06", "title": "Cuti Sekolah", "type": "school" },
+            { "start": "2026-05-14", "end": "2026-05-20", "title": "Peperiksaan PPP1", "type": "exam" },
+            { "start": "2026-08-16", "end": "2026-08-27", "title": "Peperiksaan PPP2", "type": "exam" },
+            { "start": "2026-09-25", "end": "2026-10-05", "title": "Peperiksaan UASA", "type": "exam" },
+            { "start": "2026-07-03", "end": "2026-07-04", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-07-31", "end": "2026-08-01", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-09-02", "end": "2026-09-03", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-04-11", "end": "2026-04-11", "title": "Outing", "type": "outing" },
+            { "start": "2026-05-09", "end": "2026-05-09", "title": "Outing", "type": "outing" },
+            { "start": "2026-06-20", "end": "2026-06-20", "title": "Outing", "type": "outing" },
+            { "start": "2026-07-18", "end": "2026-07-18", "title": "Outing", "type": "outing" },
+            { "start": "2026-08-15", "end": "2026-08-15", "title": "Outing", "type": "outing" },
+            { "start": "2026-09-19", "end": "2026-09-19", "title": "Outing", "type": "outing" },
+            { "start": "2026-10-24", "end": "2026-10-24", "title": "Outing", "type": "outing" },
+            { "start": "2026-11-21", "end": "2026-11-21", "title": "Outing", "type": "outing" }
+        ];
+
+        function generateTuisyenSchedule() {
+            const dates = []; const year = 2026; let date = new Date(year, 3, 11);
+            while (date.getFullYear() === year) {
+                const dStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                const exclusion = mtsdStaticData.find(ex => dStr >= ex.start && dStr <= ex.end);
+                if (exclusion && (exclusion.title.toLowerCase().includes("pulang bermalam") || exclusion.title.includes("Cuti"))) {
+                    const friday = new Date(date); friday.setDate(friday.getDate() - 1);
+                    const fStr = `${friday.getFullYear()}-${(friday.getMonth() + 1).toString().padStart(2, '0')}-${friday.getDate().toString().padStart(2, '0')}`;
+                    dates.push({ start: fStr, end: fStr, title: "Tuisyen (Online)", type: "tuisyen" });
+                } else {
+                    dates.push({ start: dStr, end: dStr, title: "Tuisyen (Fizikal)", type: "tuisyen" });
+                }
+                date.setDate(date.getDate() + 7);
+            }
+            return dates;
+        }
+
+        const combinedMtsdData = [...mtsdStaticData, ...generateTuisyenSchedule()];
+
+        const yearList = document.getElementById('yearList');
+        const sidebar = document.getElementById('eventSidebar');
+        const toast = document.getElementById('toast');
+
+        function processStaticMtsdData() {
+            const year = currentDate.getFullYear();
+            mtsdEvents = {};
+            combinedMtsdData.forEach(event => {
+                let curr = new Date(event.start + 'T00:00:00');
+                const last = new Date(event.end + 'T00:00:00');
+                while (curr <= last) {
+                    if (curr.getFullYear() === year) {
+                        const dKey = `${year}-${curr.getMonth() + 1}-${curr.getDate()}`;
+                        if (!mtsdEvents[dKey]) mtsdEvents[dKey] = [];
+                        mtsdEvents[dKey].push({ title: event.title, type: event.type });
+                    }
+                    curr.setDate(curr.getDate() + 1);
+                }
+            });
+        }
+
+        function renderYear() {
+            const year = 2026;
+            const today = new Date();
+            yearList.innerHTML = '';
+            
+            const startMonth = (year === today.getFullYear()) ? today.getMonth() : 0;
+            if (year < today.getFullYear()) {
+                yearList.innerHTML = '<p class="empty-msg">Year view restricted to present/future.</p>';
+                return;
+            }
+
+            for (let month = 0; month < 12; month++) {
+                if (month < startMonth) continue;
+                const monthSection = document.createElement('div');
+                monthSection.className = `month-section ${month === today.getMonth() ? 'expanded' : 'collapsed'}`;
+                monthSection.id = `month-${month}`;
+
+                const monthHeader = document.createElement('div');
+                monthHeader.className = 'month-header';
+                
+                const monthTitle = document.createElement('span');
+                monthTitle.textContent = months[month];
+                monthHeader.appendChild(monthTitle);
+                
+                monthHeader.onclick = () => toggleMonth(month);
+                monthSection.appendChild(monthHeader);
+
+                const daysList = document.createElement('div');
+                daysList.className = 'days-list';
+
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    daysList.appendChild(createDayRow(year, month, day));
+                }
+                monthSection.appendChild(daysList);
+                yearList.appendChild(monthSection);
+            }
+            scrollToToday();
+        }
+
+        function createDayRow(year, month, day) {
+            const date = new Date(year, month, day);
+            const dateKey = `${year}-${month + 1}-${day}`;
+            const row = document.createElement('div');
+            row.className = 'day-row';
+            
+            const today = new Date();
+            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                row.classList.add('today');
+                row.id = 'today-row';
+            }
+
+            let badges = [];
+            let userTags = [];
+
+            if (mtsdEvents[dateKey]) {
+                mtsdEvents[dateKey].forEach(evt => {
+                    badges.push(`<span class="badge ${evt.type}">${evt.title}</span>`);
+                });
+            }
+
+            if (events[dateKey]) {
+                events[dateKey].forEach(evt => {
+                    // Security: Escaping user text
+                    const safeText = document.createElement('div');
+                    safeText.textContent = evt;
+                    userTags.push(`<span class="tag user-event">${safeText.innerHTML}</span>`);
+                });
+            }
+
+            row.innerHTML = `
+                <div class="day-linear-info">
+                    <span class="day-label">${date.toLocaleDateString('en-US', {weekday:'short'})}, ${day}/${month + 1}:</span>
+                    <div class="day-agenda">
+                        ${badges.length > 0 ? `<div class="badge-container">${badges.join('')}</div>` : ''}
+                        ${userTags.length > 0 ? `<div class="user-tags">${userTags.join('')}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            row.onclick = () => openSidebar(year, month, day);
+            return row;
+        }
+
+        function toggleMonth(idx) {
+            focusedMonth = idx;
+            document.querySelectorAll('.month-section').forEach(sec => {
+                const isTarget = sec.id === `month-${idx}`;
+                sec.classList.toggle('expanded', isTarget);
+                sec.classList.toggle('collapsed', !isTarget);
+            });
+        }
+
+        function openSidebar(y, m, d) {
+            selectedDate = { y, m, d };
+            const dateKey = `${y}-${m + 1}-${d}`;
+            document.getElementById('selectedDateTitle').textContent = `${fullMonths[m]} ${d}, ${y}`;
+            sidebar.classList.add('open');
+            renderEventList(dateKey);
+        }
+
+        function renderEventList(dateKey) {
+            const list = document.getElementById('eventList');
+            list.innerHTML = '';
+            
+            if (mtsdEvents[dateKey]) {
+                mtsdEvents[dateKey].forEach(evt => {
+                    const item = document.createElement('div');
+                    item.className = `event-item ${evt.type}`;
+                    item.textContent = evt.title;
+                    list.appendChild(item);
+                });
+            }
+
+            if (events[dateKey]) {
+                events[dateKey].forEach((evt, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'event-item user-event';
+                    item.style.display = 'flex';
+                    item.style.justifyContent = 'space-between';
+                    
+                    const text = document.createElement('span');
+                    text.textContent = evt;
+                    
+                    const del = document.createElement('button');
+                    del.innerHTML = '&times;';
+                    del.style.border = 'none'; del.style.background = 'none'; del.style.color = 'red'; del.style.cursor = 'pointer';
+                    del.onclick = (e) => { e.stopPropagation(); deleteEvent(dateKey, idx); };
+                    
+                    item.appendChild(text);
+                    item.appendChild(del);
+                    list.appendChild(item);
+                });
+            }
+
+            if (list.innerHTML === '') list.innerHTML = '<p class="empty-msg">Clear day.</p>';
+        }
+
+        function addEvent() {
+            const input = document.getElementById('eventInput');
+            const val = input.value.trim();
+            if (!val || !selectedDate) return;
+            const key = `${selectedDate.y}-${selectedDate.m + 1}-${selectedDate.d}`;
+            if (!events[key]) events[key] = [];
+            events[key].push(val);
+            localStorage.setItem('agenda_events', JSON.stringify(events));
+            input.value = '';
+            renderEventList(key);
+            renderYear();
+            showToast('Event recorded');
+        }
+
+        function deleteEvent(key, idx) {
+            events[key].splice(idx, 1);
+            if (events[key].length === 0) delete events[key];
+            localStorage.setItem('agenda_events', JSON.stringify(events));
+            renderEventList(key);
+            renderYear();
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function scrollToToday() {
+            const today = new Date();
+            const monthIdx = today.getMonth();
+            toggleMonth(monthIdx); // Ensure month is expanded first
+            setTimeout(() => {
+                const todayRow = document.getElementById('today-row');
+                if (todayRow) todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
+        function copyForWA() {
+            const year = currentDate.getFullYear();
+            const month = focusedMonth;
+            let text = `*AGENDA ${fullMonths[month].toUpperCase()} ${year}*\n\n`;
+            const days = new Date(year, month + 1, 0).getDate();
+            for (let d = 1; d <= days; d++) {
+                const key = `${year}-${month + 1}-${d}`;
+                let items = [];
+                if (mtsdEvents[key]) mtsdEvents[key].forEach(e => items.push(e.type === 'holiday' ? `_${e.title}_` : `*${e.title}*`));
+                if (events[key]) events[key].forEach(e => items.push(`*${e}*`));
+                if (items.length > 0) {
+                    const dt = new Date(year, month, d);
+                    text += `${dt.toLocaleDateString('en-US',{weekday:'short'})}, ${d}/${month + 1}: ${items.join(', ')}\n`;
+                }
+            }
+            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+        }
+
+        // Theme & Static Initialization
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = themeToggle.querySelector('.sun-icon');
+        const moonIcon = themeToggle.querySelector('.moon-icon');
+
+        function applyTheme() {
+            let activeTheme = theme;
+            if (theme === 'system') {
+                activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.body.classList.toggle('dark-theme', activeTheme === 'dark');
+            sunIcon.style.display = activeTheme === 'dark' ? 'none' : 'block';
+            moonIcon.style.display = activeTheme === 'dark' ? 'block' : 'none';
+            if (theme === 'system') {
+                localStorage.removeItem('agenda_theme');
+            } else {
+                localStorage.setItem('agenda_theme', theme);
+            }
+        }
+
+        themeToggle.onclick = () => {
+            if (theme === 'system') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            else if (theme === 'light') theme = 'dark';
+            else theme = 'system';
+            applyTheme();
+            if (theme === 'system') showToast('System Theme (Auto)');
+        };
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (theme === 'system') applyTheme();
+        });
+
+        document.getElementById('todayBtn').onclick = scrollToToday;
+        document.getElementById('copyWabtn').onclick = copyForWA;
+        document.getElementById('closeSidebar').onclick = () => sidebar.classList.remove('open');
+        document.getElementById('addEventBtn').onclick = addEvent;
+        document.getElementById('eventInput').onkeypress = (e) => { if(e.key === 'Enter') addEvent(); };
+
+        // Install Guide Logic
+        document.getElementById('installBtnHeader').onclick = () => {
+            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const msg = isiOS 
+                ? "iPhone: Tap 'Share' ➔ 'Add to Home Screen'" 
+                : "Android: Tap Menu (⋮) ➔ 'Install App' or 'Add to Home Screen'";
+            showToast(msg);
+        };
+
+        // Backup & Restore Logic
+        document.getElementById('exportBtnHeader').onclick = () => {
+            const dataStr = JSON.stringify(events);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'agenda_backup.json';
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            showToast('Backup file exported!');
+        };
+
+        document.getElementById('importBtnHeader').onclick = () => document.getElementById('importFile').click();
+
+        document.getElementById('importFile').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importedEvents = JSON.parse(event.target.result);
+                    events = { ...events, ...importedEvents };
+                    localStorage.setItem('agenda_events', JSON.stringify(events));
+                    renderYear();
+                    showToast('Data imported & merged!');
+                } catch (err) {
+                    showToast('Error: Invalid backup file');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        window.onclick = (e) => { if(e.target === sidebar) sidebar.classList.remove('open'); };
+
+        // Start
+        processStaticMtsdData();
+        renderYear();
+    </script>
+</body>
+</html>
