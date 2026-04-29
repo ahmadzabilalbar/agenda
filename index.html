@@ -794,10 +794,19 @@
             reader.onload = (event) => {
                 try {
                     const importedEvents = JSON.parse(event.target.result);
-                    events = { ...events, ...importedEvents };
+                    // Deep Merge Logic
+                    Object.keys(importedEvents).forEach(dateKey => {
+                        if (!events[dateKey]) {
+                            events[dateKey] = importedEvents[dateKey];
+                        } else {
+                            // Combine and remove exact duplicates
+                            const combined = [...events[dateKey], ...importedEvents[dateKey]];
+                            events[dateKey] = [...new Set(combined)];
+                        }
+                    });
                     localStorage.setItem('agenda_events', JSON.stringify(events));
                     renderYear();
-                    showToast('Data imported & merged!');
+                    showToast('Data merged successfully!');
                 } catch (err) {
                     showToast('Error: Invalid backup file');
                 }
