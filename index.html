@@ -428,8 +428,14 @@
                 <input type="text" id="eventInput" placeholder="Add note..." maxlength="100">
                 <button id="addEventBtn" class="btn-add">Save to Agenda</button>
             </div>
+            <div id="filterContainer" style="margin-top: 24px; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px solid var(--card-border);">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Display Settings</div>
+                <div id="filterList" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Filter toggles injected here -->
+                </div>
+            </div>
             <div class="app-version-tag">
-                <span>v1.0.0</span>
+                <span>v1.1.0</span>
                 <button onclick="location.reload(true)" style="background:none; border:none; color:var(--primary); font-size:0.6rem; cursor:pointer; text-decoration:underline; margin-left:8px;">Check for Updates</button>
             </div>
         </aside>
@@ -444,6 +450,9 @@
         let focusedMonth = new Date().getMonth();
         let events = JSON.parse(localStorage.getItem('agenda_events')) || {};
         let theme = localStorage.getItem('agenda_theme') || 'system';
+        let filters = JSON.parse(localStorage.getItem('agenda_filters')) || {
+            holiday: true, dorm: true, school: true, matric: true, tuisyen: true, exam: true, outing: true
+        };
         
         const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
         const fullMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -583,7 +592,9 @@
 
             if (mtsdEvents[dateKey]) {
                 mtsdEvents[dateKey].forEach(evt => {
-                    badges.push(`<span class="badge ${evt.type}">${evt.title}</span>`);
+                    if (filters[evt.type]) {
+                        badges.push(`<span class="badge ${evt.type}">${evt.title}</span>`);
+                    }
                 });
             }
 
@@ -816,9 +827,39 @@
 
         window.onclick = (e) => { if(e.target === sidebar) sidebar.classList.remove('open'); };
 
+        function renderFilters() {
+            const list = document.getElementById('filterList');
+            const labels = {
+                holiday: 'Holidays',
+                dorm: 'Dorm Dates',
+                school: 'School Holidays',
+                matric: 'Cuti Matrik',
+                tuisyen: 'Tuisyen Classes',
+                exam: 'Exam Dates',
+                outing: 'Outing / Pulang'
+            };
+            
+            list.innerHTML = '';
+            Object.keys(filters).forEach(type => {
+                const item = document.createElement('label');
+                item.style = 'display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.8rem; font-weight:500;';
+                item.innerHTML = `
+                    <input type="checkbox" ${filters[type] ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--primary);">
+                    <span class="badge ${type}" style="padding:2px 8px; font-size:0.6rem;">${labels[type]}</span>
+                `;
+                item.querySelector('input').onchange = (e) => {
+                    filters[type] = e.target.checked;
+                    localStorage.setItem('agenda_filters', JSON.stringify(filters));
+                    renderYear();
+                };
+                list.appendChild(item);
+            });
+        }
+
         // Start
         processStaticMtsdData();
         renderYear();
+        renderFilters();
     </script>
 </body>
 </html>
