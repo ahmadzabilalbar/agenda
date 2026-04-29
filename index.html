@@ -224,12 +224,10 @@
         }
 
         .badge.holiday { background: rgba(225, 29, 72, 0.15); color: var(--holiday-color); }
-        .badge.event { background: rgba(5, 150, 105, 0.15); color: var(--event-color); }
         .badge.tuisyen { background: rgba(79, 70, 229, 0.15); color: var(--tuisyen-color); }
-        .badge.dorm { background: rgba(219, 39, 119, 0.15); color: var(--dorm-color); }
         .badge.school { background: rgba(8, 145, 178, 0.15); color: var(--school-color); }
         .badge.exam { background: rgba(234, 88, 12, 0.15); color: var(--exam-color); }
-        .badge.outing { background: rgba(219, 39, 119, 0.15); color: var(--dorm-color); }
+        .badge.mtsd { background: rgba(219, 39, 119, 0.15); color: var(--dorm-color); }
         .badge.matric { background: rgba(14, 165, 233, 0.15); color: var(--matric-color); }
 
         .tag.user-event {
@@ -277,10 +275,9 @@
         }
         .event-item.holiday { border-left-color: var(--holiday-color); }
         .event-item.tuisyen { border-left-color: var(--tuisyen-color); }
-        .event-item.dorm { border-left-color: var(--dorm-color); }
         .event-item.school { border-left-color: var(--school-color); }
+        .event-item.mtsd { border-left-color: var(--dorm-color); }
         .event-item.exam { border-left-color: var(--exam-color); }
-        .event-item.outing { border-left-color: var(--dorm-color); }
         .event-item.matric { border-left-color: var(--matric-color); }
         .event-item.user-event { border-left: 4px dashed var(--user-color); background: rgba(99, 102, 241, 0.05); }
 
@@ -295,7 +292,10 @@
             font-family: inherit;
         }
         #eventInput:focus { border-color: var(--primary); background: transparent; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 12px; font-weight: 600; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: opacity 0.2s; }
+        .btn-add:hover { opacity: 0.9; }
+        .btn-cancel { background: rgba(0,0,0,0.05); color: var(--text-muted); border: none; padding: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; }
+        .btn-cancel:hover { background: rgba(0,0,0,0.08); }
 
         /* Toast Message */
         .app-version-tag {
@@ -418,11 +418,14 @@
             <div class="event-list" id="eventList"></div>
             <div class="add-event-form">
                 <input type="text" id="eventInput" placeholder="Add note..." maxlength="100">
-                <button id="addEventBtn" class="btn-add">Save to Agenda</button>
+                <div style="display: flex; gap: 8px;">
+                    <button id="addEventBtn" class="btn-add" style="flex: 2;">Save</button>
+                    <button id="cancelEventBtn" class="btn-cancel" style="flex: 1;">Cancel</button>
+                </div>
             </div>
             <div id="filterContainer" style="margin-top: 24px; padding: 16px; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px solid var(--card-border);">
                 <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Display Settings</div>
-                <div id="filterList" style="display: flex; flex-direction: column; gap: 8px;">
+                <div id="filterList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <!-- Filter toggles injected here -->
                 </div>
             </div>
@@ -440,7 +443,7 @@
         let events = JSON.parse(localStorage.getItem('agenda_events')) || {};
         let theme = localStorage.getItem('agenda_theme') || 'system';
         let filters = JSON.parse(localStorage.getItem('agenda_filters')) || {
-            holiday: true, dorm: true, school: true, matric: true, tuisyen: true, exam: true, outing: true
+            holiday: true, mtsd: true, exam: true, school: true, matric: true, tuisyen: true
         };
         
         const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -461,31 +464,31 @@
             { "start": "2026-09-16", "end": "2026-09-16", "title": "Hari Malaysia", "type": "holiday" },
             { "start": "2026-11-08", "end": "2026-11-08", "title": "Hari Deepavali", "type": "holiday" },
             { "start": "2026-12-25", "end": "2026-12-25", "title": "Hari Krismas", "type": "holiday" },
-            { "start": "2026-11-06", "end": "2026-11-09", "title": "MTSD PULANG BERMALAM", "type": "dorm" },
+            { "start": "2026-11-06", "end": "2026-11-09", "title": "Pulang Bermalam", "type": "mtsd" },
             { "start": "2026-12-04", "end": "2026-12-31", "title": "Cuti Sekolah", "type": "school" },
-            { "start": "2026-01-23", "end": "2026-01-31", "title": "Cuti Matrik", "type": "matric" },
-            { "start": "2026-05-15", "end": "2026-07-31", "title": "Cuti Matrik", "type": "matric" },
-            { "start": "2026-09-18", "end": "2026-09-26", "title": "Cuti Matrik", "type": "matric" },
-            { "start": "2026-01-30", "end": "2026-01-31", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-01-23", "end": "2026-01-31", "title": "Matric Holidays", "type": "matric" },
+            { "start": "2026-05-15", "end": "2026-07-31", "title": "Matric Holidays", "type": "matric" },
+            { "start": "2026-09-18", "end": "2026-09-26", "title": "Matric Holidays", "type": "matric" },
+            { "start": "2026-01-30", "end": "2026-01-31", "title": "Pulang Bermalam", "type": "mtsd" },
             { "start": "2026-02-13", "end": "2026-02-21", "title": "Cuti Sekolah", "type": "school" },
-            { "start": "2026-03-06", "end": "2026-03-07", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-03-06", "end": "2026-03-07", "title": "Pulang Bermalam", "type": "mtsd" },
             { "start": "2026-03-20", "end": "2026-03-29", "title": "Cuti Sekolah", "type": "school" },
-            { "start": "2026-04-24", "end": "2026-04-25", "title": "Pulang Bermalam", "type": "dorm" },
+            { "start": "2026-04-24", "end": "2026-04-25", "title": "Pulang Bermalam", "type": "mtsd" },
             { "start": "2026-05-22", "end": "2026-06-06", "title": "Cuti Sekolah", "type": "school" },
-            { "start": "2026-05-14", "end": "2026-05-20", "title": "Peperiksaan PPP1", "type": "exam" },
-            { "start": "2026-08-16", "end": "2026-08-27", "title": "Peperiksaan PPP2", "type": "exam" },
-            { "start": "2026-09-25", "end": "2026-10-05", "title": "Peperiksaan UASA", "type": "exam" },
-            { "start": "2026-07-03", "end": "2026-07-04", "title": "Pulang Bermalam", "type": "dorm" },
-            { "start": "2026-07-31", "end": "2026-08-01", "title": "Pulang Bermalam", "type": "dorm" },
-            { "start": "2026-09-02", "end": "2026-09-03", "title": "Pulang Bermalam", "type": "dorm" },
-            { "start": "2026-04-11", "end": "2026-04-11", "title": "Outing", "type": "outing" },
-            { "start": "2026-05-09", "end": "2026-05-09", "title": "Outing", "type": "outing" },
-            { "start": "2026-06-20", "end": "2026-06-20", "title": "Outing", "type": "outing" },
-            { "start": "2026-07-18", "end": "2026-07-18", "title": "Outing", "type": "outing" },
-            { "start": "2026-08-15", "end": "2026-08-15", "title": "Outing", "type": "outing" },
-            { "start": "2026-09-19", "end": "2026-09-19", "title": "Outing", "type": "outing" },
-            { "start": "2026-10-24", "end": "2026-10-24", "title": "Outing", "type": "outing" },
-            { "start": "2026-11-21", "end": "2026-11-21", "title": "Outing", "type": "outing" }
+            { "start": "2026-05-14", "end": "2026-05-20", "title": "Exam PPP1", "type": "exam" },
+            { "start": "2026-08-16", "end": "2026-08-27", "title": "Exam PPP2", "type": "exam" },
+            { "start": "2026-09-25", "end": "2026-10-05", "title": "Exam UASA", "type": "exam" },
+            { "start": "2026-07-03", "end": "2026-07-04", "title": "Pulang Bermalam", "type": "mtsd" },
+            { "start": "2026-07-31", "end": "2026-08-01", "title": "Pulang Bermalam", "type": "mtsd" },
+            { "start": "2026-09-02", "end": "2026-09-03", "title": "Pulang Bermalam", "type": "mtsd" },
+            { "start": "2026-04-11", "end": "2026-04-11", "title": "Outing", "type": "mtsd" },
+            { "start": "2026-05-09", "end": "2026-05-09", "title": "Outing", "type": "mtsd" },
+            { "start": "2026-06-20", "end": "2026-06-20", "title": "Outing", "type": "mtsd" },
+            { "start": "2026-07-18", "end": "2026-07-18", "title": "Outing", "type": "mtsd" },
+            { "start": "2026-08-15", "end": "2026-08-15", "title": "Outing", "type": "mtsd" },
+            { "start": "2026-09-19", "end": "2026-09-19", "title": "Outing", "type": "mtsd" },
+            { "start": "2026-10-24", "end": "2026-10-24", "title": "Outing", "type": "mtsd" },
+            { "start": "2026-11-21", "end": "2026-11-21", "title": "Outing", "type": "mtsd" }
         ];
 
         function generateTuisyenSchedule() {
@@ -521,6 +524,7 @@
                     if (curr.getFullYear() === year) {
                         const dKey = `${year}-${curr.getMonth() + 1}-${curr.getDate()}`;
                         if (!mtsdEvents[dKey]) mtsdEvents[dKey] = [];
+                        
                         mtsdEvents[dKey].push({ title: event.title, type: event.type });
                     }
                     curr.setDate(curr.getDate() + 1);
@@ -581,7 +585,9 @@
 
             if (mtsdEvents[dateKey]) {
                 mtsdEvents[dateKey].forEach(evt => {
-                    if (filters[evt.type]) {
+                    // Check filter: MTSD toggle controls both mtsd and exam types
+                    const isVisible = (evt.type === 'exam') ? filters.mtsd : filters[evt.type];
+                    if (isVisible) {
                         badges.push(`<span class="badge ${evt.type}">${evt.title}</span>`);
                     }
                 });
@@ -767,6 +773,10 @@
         // Also close on main background
         document.querySelector('.bg-mesh').onclick = () => sidebar.classList.remove('open');
         document.getElementById('addEventBtn').onclick = addEvent;
+        document.getElementById('cancelEventBtn').onclick = () => {
+            document.getElementById('eventInput').value = '';
+            sidebar.classList.remove('open');
+        };
         document.getElementById('eventInput').onkeypress = (e) => { if(e.key === 'Enter') addEvent(); };
 
         document.getElementById('refreshBtn').onclick = () => location.reload(true);
@@ -778,13 +788,11 @@
         function renderFilters() {
             const list = document.getElementById('filterList');
             const labels = {
-                holiday: 'Holidays',
-                dorm: 'Dorm Dates',
+                holiday: 'Public Holidays',
+                mtsd: 'MTSD (Dorm, Outing, Exam)',
                 school: 'School Holidays',
-                matric: 'Cuti Matrik',
-                tuisyen: 'Tuisyen Classes',
-                exam: 'Exam Dates',
-                outing: 'Outing / Pulang'
+                matric: 'Matric Holidays',
+                tuisyen: 'Tuition'
             };
             
             list.innerHTML = '';
@@ -797,6 +805,8 @@
                 `;
                 item.querySelector('input').onchange = (e) => {
                     filters[type] = e.target.checked;
+                    // If toggling MTSD, also toggle Exam
+                    if (type === 'mtsd') filters.exam = e.target.checked;
                     localStorage.setItem('agenda_filters', JSON.stringify(filters));
                     renderYear();
                 };
