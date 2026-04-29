@@ -264,7 +264,7 @@
         .event-sidebar.open { right: 0; }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .sidebar-header h3 { font-size: 1.25rem; font-weight: 700; }
-        .btn-close { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; }
+        .btn-close { display: none; }
 
         .event-list { flex: 1; overflow-y: auto; }
         .event-item {
@@ -410,8 +410,10 @@
 
         <aside class="event-sidebar" id="eventSidebar">
             <div class="sidebar-header">
-                <h3 id="selectedDateTitle">Date Details</h3>
-                <button id="closeSidebar" class="btn-close">&times;</button>
+                <button id="closeSidebar" class="btn-icon" style="border:none; padding:0; margin-right:12px;" title="Back to Calendar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <h3 id="selectedDateTitle" style="flex:1;">Date Details</h3>
             </div>
             <div class="event-list" id="eventList"></div>
             <div class="add-event-form">
@@ -744,6 +746,13 @@
         document.getElementById('todayBtn').onclick = scrollToToday;
         document.getElementById('copyWabtn').onclick = copyForWA;
         document.getElementById('closeSidebar').onclick = () => sidebar.classList.remove('open');
+
+        // Close sidebar on background click
+        document.querySelector('.calendar-list-wrapper').onclick = (e) => {
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        };
         document.getElementById('addEventBtn').onclick = addEvent;
         document.getElementById('eventInput').onkeypress = (e) => { if(e.key === 'Enter') addEvent(); };
 
