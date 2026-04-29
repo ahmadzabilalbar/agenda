@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/100/100501.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQWdlbmRhIiwic2hvcnRfbmFtZSI6IkFnZW5kYSIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiM0ZjQ2ZTUiLCJ0aGVtZV9jb2xvciI6IiM0ZjQ2ZTUiLCJzdGFydF91cmwiOiIuIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzEwMC8xMDA1MDEucG5nIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyIsInB1cnBvc2UiOiJhbnkgbWFza2FibGUifV19">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQWdlbmRhIiwic2hvcnRfbmFtZSI6IkFnZW5kYSIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJ0aGVtZV9jb2xvciI6IiM0ZjQ2ZTUiLCJzdGFydF91cmwiOiIuIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vaW1nLmljb25zOC5jb20vZm9udGF3ZXNvbWUvNTEyL2NhbGVuZGFyLWRheXMucG5nIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyIsInB1cnBvc2UiOiJhbnkgbWFza2FibGUifV19">
     
     <style>
         :root {
@@ -341,7 +341,8 @@
             .calendar-controls { display: none !important; }
             .header-actions { display: flex !important; gap: 4px; align-items: center; justify-content: flex-end; flex: 1; }
             .header-actions .btn-text { display: none !important; }
-            .brand h1 { font-size: 0.9rem; flex-shrink: 0; }
+            .brand h1 { font-size: 0.9rem; flex-shrink: 0; pointer-events: none; }
+            .brand a { display: block; }
             
             .btn-icon { padding: 8px; border: none; background: transparent; }
 
@@ -379,7 +380,7 @@
     <main class="app-container">
         <header class="app-header">
             <div class="brand">
-                <h1>Agenda<span>.</span></h1>
+                <a href="." style="text-decoration: none; color: inherit;"><h1>Agenda<span>.</span></h1></a>
             </div>
             <div class="calendar-controls">
                 <div class="current-date-display">
@@ -388,18 +389,17 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button id="refreshBtn" class="btn-icon" title="Check for Updates">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                <button id="todayBtn" class="btn-icon" title="Scroll to Today">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                 </button>
                 <button id="themeToggle" class="btn-icon" title="Toggle Theme">
-                    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path></svg>
                 </button>
-                <button id="todayBtn" class="btn-icon" title="Jump to Today">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <button id="refreshBtn" class="btn-icon" title="Check for Updates">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                 </button>
                 <button id="copyWabtn" class="btn-icon" title="Copy for WhatsApp">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
                 </button>
             </div>
         </header>
@@ -410,10 +410,13 @@
 
         <aside class="event-sidebar" id="eventSidebar">
             <div class="sidebar-header">
-                <button id="closeSidebar" class="btn-icon" style="border:none; padding:0; margin-right:12px;" title="Back to Calendar">
+                <button id="closeSidebar" class="btn-icon" style="margin-right: 8px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </button>
-                <h3 id="selectedDateTitle" style="flex:1;">Date Details</h3>
+                <h3 id="sidebarTitle" style="flex:1;">Date Details</h3>
+                <button id="copyWabtn" class="btn-icon" title="Copy for WhatsApp">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
             </div>
             <div class="event-list" id="eventList"></div>
             <div class="add-event-form">
