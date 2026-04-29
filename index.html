@@ -733,13 +733,13 @@
                 if (includeStatic && mtsdEvents[key]) {
                     mtsdEvents[key].forEach(e => {
                         const isVisible = (e.type === 'exam') ? filters.mtsd : filters[e.type];
-                        if (isVisible) items.push(e.type === 'holiday' ? `_${e.title}_` : `*${e.title}*`);
+                        if (isVisible) items.push(e.title);
                     });
                 }
-                if (events[key]) events[key].forEach(e => items.push(`*${e}*`));
+                if (events[key]) events[key].forEach(e => items.push(e));
                 if (items.length > 0) {
                     const dt = new Date(year, month, d);
-                    text += `${dt.toLocaleDateString('en-US',{weekday:'short'})}, ${d}/${month + 1} ${items.join(', ')}\n`;
+                    text += `${dt.toLocaleDateString('en-US',{weekday:'short'})}, ${d}/${month + 1} - ${items.join(', ')}\n`;
                 }
             }
             navigator.clipboard.writeText(text).then(() => showToast(includeStatic ? 'All Data Copied!' : 'Notes Only Copied!'));
