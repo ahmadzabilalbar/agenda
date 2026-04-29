@@ -209,11 +209,11 @@
         .day-row:hover { background: rgba(0,0,0,0.03); }
         .day-row.today { background: var(--today-bg); border-left: 2px solid var(--primary); }
 
-        .day-linear-info { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; width: 100%; }
-        .day-label { font-weight: 500; color: var(--text-main); min-width: 75px; }
-        .day-agenda { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; justify-content: flex-start; }
-        .user-tags { display: flex; gap: 4px; overflow: hidden; }
-        .badge-container { display: flex; gap: 4px; align-items: center; margin-left: auto; flex-shrink: 0; }
+        .day-linear-info { display: flex; align-items: flex-start; gap: 10px; font-size: 0.75rem; width: 100%; padding: 4px 0; }
+        .day-label { font-weight: 700; color: var(--text-main); min-width: 65px; padding-top: 2px; }
+        .day-agenda { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; }
+        .user-tags, .badge-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+        .badge, .tag.user-event { align-self: flex-start; width: fit-content; }
         .badge {
             padding: 1px 6px;
             border-radius: 4px;
@@ -601,8 +601,8 @@
                 <div class="day-linear-info">
                     <span class="day-label">${date.toLocaleDateString('en-US', {weekday:'short'})}, ${day}/${month + 1}</span>
                     <div class="day-agenda">
-                        ${userTags.length > 0 ? `<div class="user-tags">${userTags.join('')}</div>` : ''}
-                        ${badges.length > 0 ? `<div class="badge-container">${badges.join('')}</div>` : ''}
+                        ${userTags.length > 0 ? userTags.map(t => `<div class="user-tags">${t}</div>`).join('') : ''}
+                        ${badges.length > 0 ? badges.map(b => `<div class="badge-container">${b}</div>`).join('') : ''}
                     </div>
                 </div>
             `;
