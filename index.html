@@ -600,7 +600,7 @@
 
             row.innerHTML = `
                 <div class="day-linear-info">
-                    <span class="day-label">${date.toLocaleDateString('en-US', {weekday:'short'})}, ${day}/${month + 1}:</span>
+                    <span class="day-label">${date.toLocaleDateString('en-US', {weekday:'short'})}, ${day}/${month + 1}</span>
                     <div class="day-agenda">
                         ${badges.length > 0 ? `<div class="badge-container">${badges.join('')}</div>` : ''}
                         ${userTags.length > 0 ? `<div class="user-tags">${userTags.join('')}</div>` : ''}
@@ -715,7 +715,7 @@
                 if (events[key]) events[key].forEach(e => items.push(`*${e}*`));
                 if (items.length > 0) {
                     const dt = new Date(year, month, d);
-                    text += `${dt.toLocaleDateString('en-US',{weekday:'short'})}, ${d}/${month + 1}: ${items.join(', ')}\n`;
+                    text += `${dt.toLocaleDateString('en-US',{weekday:'short'})}, ${d}/${month + 1} ${items.join(', ')}\n`;
                 }
             }
             navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
